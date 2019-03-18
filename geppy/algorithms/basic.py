@@ -10,7 +10,8 @@ can be used as a reference.
 import deap
 import random
 import warnings
-
+from ..support.simplification import *
+import numpy as np
 
 def _validate_basic_toolbox(tb):
     """
@@ -54,7 +55,7 @@ def _apply_crossover(population, operator, pb):
 
 
 def gep_simple(population, toolbox, n_generations=100, n_elites=1,
-               stats=None, hall_of_fame=None, verbose=__debug__):
+               stats=None, hall_of_fame=None, verbose=__debug__, ter_threshold=None):
     """
     This algorithm performs the simplest and standard gene expression programming.
     The flowchart of this algorithm can be found
@@ -106,10 +107,44 @@ def gep_simple(population, toolbox, n_generations=100, n_elites=1,
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_individuals), **record)
         if verbose:
+            print("----------")
             print(logbook.stream)
+
+        if ter_threshold is not None:
+            flag_non_terminal = []
+            index = 0
+            for thre in ter_threshold.items():
+                if thre[1] == None:
+                    flag_non_terminal.append(True)
+                else:
+                    if thre[0] == "min":
+                        if hall_of_fame[0].fitness.values[index] < thre[1]:
+                            flag_non_terminal.append(False)
+                        else:
+                            flag_non_terminal.append(True)
+                    elif thre[0] == "max":
+                        if hall_of_fame[0].fitness.values[index] > thre[1]:
+                            flag_non_terminal.append(False)
+                        else:
+                            flag_non_terminal.append(True)
+                index += 1
+
+            if np.prod(flag_non_terminal) != True:
+                break
 
         if gen == n_generations:
             break
+
+        print("fitness for hall_of_fame:")
+        for fame in hall_of_fame:
+            print(fame.fitness.values)
+
+        best_ind = hall_of_fame[0]
+        simplified_best = simplify(best_ind)
+        # print('Best individual: ') 
+        # print(best_ind)
+        print('Simplified best individual: ') 
+        print(simplified_best)
 
         # selection with elitism
         elites = deap.tools.selBest(population, k=n_elites)

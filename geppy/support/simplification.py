@@ -23,7 +23,6 @@ DEFAULT_SYMBOLIC_FUNCTION_MAP = {
     operator.neg.__name__: operator.neg,
     operator.floordiv.__name__: operator.floordiv,
     operator.truediv.__name__: operator.truediv,
-    'protected_div': operator.truediv,
     math.log.__name__: sp.log
 }
 """
@@ -65,9 +64,11 @@ def _simplify_kexpression(expr, symbolic_function_map):
         if isinstance(p, Function):
             try:
                 sym_func = symbolic_function_map[p.name]
-            except KeyError as e:
-                print("Please provide the symbolic function mapping for '{}' in symbolic_function_map.".format(p.name))
-                raise e
+            # except KeyError as e:
+            #     print("Please provide the symbolic function mapping for '{}' in symbolic_function_map.".format(p.name))
+            #     raise e
+            except:
+                sym_func = sp.Function(p.name)
             args = []
             for _ in range(p.arity):
                 t = expr.pop()  # t may be a terminal or a symbolic expression already
