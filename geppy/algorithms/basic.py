@@ -135,16 +135,20 @@ def gep_simple(population, toolbox, n_generations=100, n_elites=1,
         if gen == n_generations:
             break
 
+        best_ind = hall_of_fame[0]
+        print("best_ind:")
+        print(best_ind)
+
         print("fitness for hall_of_fame:")
         for fame in hall_of_fame:
             print(fame.fitness.values)
 
-        best_ind = hall_of_fame[0]
-        simplified_best = simplify(best_ind)
-        # print('Best individual: ') 
-        # print(best_ind)
-        print('Simplified best individual: ') 
-        print(simplified_best)
+
+        # simplified_best = simplify(best_ind)
+        # # print('Best individual: ') 
+        # # print(best_ind)
+        # print('Simplified best individual: ') 
+        # print(simplified_best)
 
         # selection with elitism
         elites = deap.tools.selBest(population, k=n_elites)
